@@ -1,5 +1,5 @@
 /** Default production API when `NEXT_PUBLIC_API_URL` was not set at build time. */
-const DEFAULT_PRODUCTION_API = "https://littlechampjunior-backend.vercel.app";
+const DEFAULT_PRODUCTION_API = "https://littlechampclasses-web-app-backend.vercel.app";
 
 const PRODUCTION_FRONTEND_HOSTS = new Set([
   "littlechampjunior.vercel.app",
