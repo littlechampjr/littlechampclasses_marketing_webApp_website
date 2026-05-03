@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450" fill="none">
+  <rect width="800" height="450" fill="#fdf4ff"/>
+  <path d="M400 90 L460 210 L590 220 L490 305 L520 430 L400 355 L280 430 L310 305 L210 220 L340 210 Z" fill="#f97316" opacity="0.85"/>
+  <circle cx="400" cy="240" r="40" fill="#fff" opacity="0.35"/>
+  <rect x="150" y="320" width="500" height="14" rx="7" fill="#e9d5ff"/>
+  <text x="400" y="410" text-anchor="middle" font-family="system-ui,sans-serif" font-size="28" font-weight="800" fill="#7e22ce">Hands-on activity</text>
+</svg>

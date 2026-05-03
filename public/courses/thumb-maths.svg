@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450" fill="none">
+  <rect width="800" height="450" fill="#f0fdf4"/>
+  <rect x="140" y="100" width="120" height="120" rx="20" fill="#22c55e" opacity="0.9"/>
+  <text x="200" y="195" text-anchor="middle" font-family="system-ui,sans-serif" font-size="72" font-weight="900" fill="#fff">1</text>
+  <rect x="300" y="100" width="120" height="120" rx="20" fill="#0ea5e9" opacity="0.95"/>
+  <text x="360" y="195" text-anchor="middle" font-family="system-ui,sans-serif" font-size="72" font-weight="900" fill="#fff">2</text>
+  <rect x="460" y="100" width="120" height="120" rx="20" fill="#f97316" opacity="0.95"/>
+  <text x="520" y="195" text-anchor="middle" font-family="system-ui,sans-serif" font-size="72" font-weight="900" fill="#fff">3</text>
+  <path d="M200 280h400" stroke="#16a34a" stroke-width="10" stroke-linecap="round" stroke-dasharray="24 18"/>
+  <text x="400" y="400" text-anchor="middle" font-family="system-ui,sans-serif" font-size="28" font-weight="800" fill="#15803d">Maths through play</text>
+</svg>

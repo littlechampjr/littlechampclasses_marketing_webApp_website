@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450" fill="none">
+  <rect width="800" height="450" fill="#fff1f2"/>
+  <path d="M200 280 Q400 120 600 280" stroke="#fb7185" stroke-width="14" fill="none" stroke-linecap="round"/>
+  <path d="M220 260 L260 200 L300 260 Z" fill="#f97316"/>
+  <circle cx="520" cy="200" r="36" fill="#38bdf8"/>
+  <rect x="420" y="240" width="80" height="50" rx="8" transform="rotate(-12 460 265)" fill="#a3e635"/>
+  <text x="400" y="400" text-anchor="middle" font-family="system-ui,sans-serif" font-size="28" font-weight="800" fill="#be123c">Art &amp; story lab</text>
+</svg>

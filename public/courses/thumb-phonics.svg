@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450" fill="none">
+  <rect width="800" height="450" fill="#fffbeb"/>
+  <path d="M280 320c0-80 60-160 120-200s120 40 120 120c0 50-30 90-70 110" stroke="#f97316" stroke-width="12" fill="none" stroke-linecap="round"/>
+  <rect x="320" y="120" width="24" height="80" rx="6" fill="#0ea5e9"/>
+  <rect x="360" y="100" width="24" height="100" rx="6" fill="#22c55e"/>
+  <rect x="400" y="140" width="24" height="60" rx="6" fill="#a855f7"/>
+  <text x="400" y="400" text-anchor="middle" font-family="system-ui,sans-serif" font-size="28" font-weight="800" fill="#c2410c">Rhyme &amp; chime</text>
+</svg>

@@ -1,0 +1,93 @@
+/* Layer order: Ant Design global resets (e.g. `a { color, background }`) must stay below
+   Tailwind `@layer utilities` or they override `bg-primary` / `text-primary-foreground` on
+   `next/link`. `StyleProvider` in Providers.tsx wraps antd styles in `@layer antd`. */
+@layer antd, theme, base, components, utilities;
+
+@import "tailwindcss";
+
+/* Dark utilities and tokens apply only when `class="dark"` is on <html> — not from OS preference. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #ffffff;
+  --foreground: #1a1a1a;
+  --muted: #5c5c5c;
+  --card: #ffffff;
+  --primary: #f97316;
+  --primary-foreground: #ffffff;
+  --accent: #0ea5e9;
+  --accent-foreground: #f0f9ff;
+  --ring: #f97316;
+  --header-height: 4.5rem;
+  --surface-subtle: #fff7ed;
+  --border-soft: #e5e5e5;
+}
+
+html.dark {
+  --background: #0c1222;
+  --foreground: #f4f4f5;
+  --muted: #a1a1aa;
+  --card: #141b2d;
+  --primary: #fb923c;
+  --primary-foreground: #1c0a00;
+  --accent: #38bdf8;
+  --accent-foreground: #082f49;
+  --ring: #fb923c;
+  --surface-subtle: #1a1428;
+  --border-soft: #272f40;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-card: var(--card);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-ring: var(--ring);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-border-soft: var(--border-soft);
+  --font-sans: var(--font-dm-sans);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-dm-sans), system-ui, sans-serif;
+}
+
+/* Soft CuriousJr-style page wash (light) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(900px 500px at 10% -10%, rgba(249, 115, 22, 0.12), transparent 55%),
+    radial-gradient(800px 480px at 90% 0%, rgba(14, 165, 233, 0.1), transparent 50%),
+    radial-gradient(600px 400px at 50% 100%, rgba(249, 115, 22, 0.06), transparent 45%);
+}
+
+html.dark body::before {
+  background:
+    radial-gradient(900px 500px at 10% -10%, rgba(251, 146, 60, 0.15), transparent 55%),
+    radial-gradient(800px 480px at 90% 0%, rgba(56, 189, 248, 0.12), transparent 50%),
+    radial-gradient(600px 400px at 50% 100%, rgba(251, 146, 60, 0.08), transparent 45%);
+}
+
+.font-display {
+  font-family: var(--font-nunito), var(--font-dm-sans), system-ui, sans-serif;
+}
+
+/* Hand-drawn underline (CuriousJr-style) */
+.scribble-underline {
+  background: linear-gradient(transparent 78%, rgba(249, 115, 22, 0.45) 78%, rgba(249, 115, 22, 0.45) 92%, transparent 92%);
+  padding-bottom: 0.06em;
+}
