@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { sendBookDemoOtp, verifyBookDemoOtp } from "@/lib/api/bookDemo";
 import { useOtpResendCooldown } from "./useOtpResendCooldown";
 
@@ -16,10 +16,12 @@ export type BookDemoOtpSendParams = {
  */
 export function useOtpChallenge() {
   const { secondsLeft, startCooldown, reset, canResend } = useOtpResendCooldown();
+  const lastEnrollmentIdRef = useRef<string | null>(null);
 
   const sendBookDemoOtpRequest = useCallback(
     async (params: BookDemoOtpSendParams) => {
       const res = await sendBookDemoOtp(params);
+      lastEnrollmentIdRef.current = res.enrollmentId;
       startCooldown(res.resendAfterSeconds);
       return res;
     },
@@ -27,14 +29,24 @@ export function useOtpChallenge() {
   );
 
   const verifyBookDemoOtpRequest = useCallback(async (phone: string, code: string) => {
-    return verifyBookDemoOtp({ phone, code });
+    const enrollmentId = lastEnrollmentIdRef.current ?? undefined;
+    return verifyBookDemoOtp({
+      phone,
+      code,
+      ...(enrollmentId ? { enrollmentId } : {}),
+    });
   }, []);
+
+  const resetCooldown = useCallback(() => {
+    lastEnrollmentIdRef.current = null;
+    reset();
+  }, [reset]);
 
   return {
     secondsLeft,
     canResendOtp: canResend,
     sendBookDemoOtpRequest,
     verifyBookDemoOtpRequest,
-    resetCooldown: reset,
+    resetCooldown,
   };
 }

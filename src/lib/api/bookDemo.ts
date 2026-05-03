@@ -12,7 +12,12 @@ export async function sendBookDemoOtp(body: {
   );
 }
 
-export async function verifyBookDemoOtp(body: { phone: string; code: string }) {
+export async function verifyBookDemoOtp(body: {
+  phone: string;
+  code: string;
+  /** Latest send-otp enrollment; needed when server OTP bypass returns empty meta. */
+  enrollmentId?: string;
+}) {
   return apiFetch<{ ok: boolean; token: string; enrollmentId: string }>(
     "/api/book-demo/verify-otp",
     { method: "POST", body: JSON.stringify(body) },
