@@ -157,8 +157,26 @@ export function PremiumLearnerDashboard({
           )}
         </div>
 
+        <div className="mt-8 flex flex-col items-center gap-6 sm:mt-10">
+          <Link
+            href="/programs/after-school"
+            className="inline-flex min-h-11 items-center justify-center rounded-xl border-2 border-primary px-6 text-sm font-bold text-primary transition hover:bg-primary hover:text-primary-foreground"
+          >
+            View all programs
+          </Link>
+          {/* <div className="relative h-40 w-full max-w-md opacity-90 dark:opacity-80">
+            <Image
+              src="/courses/thumb-stories.svg"
+              alt=""
+              fill
+              className="object-contain object-bottom"
+              unoptimized
+            />
+          </div> */}
+        </div>
+
         <div className="mt-10 w-full sm:mt-12">
-          <CoursePurchaseBannerSection bleed={true} />
+          <CoursePurchaseBannerSection bleed={false} />
         </div>
       </section>
 
