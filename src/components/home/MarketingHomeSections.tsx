@@ -6,6 +6,7 @@ import { Features } from "@/components/home/Features";
 import { HeroFeatureBar } from "@/components/home/HeroFeatureBar";
 import { HowItWorks } from "@/components/home/HowItWorks";
 import { Programs } from "@/components/home/Programs";
+import { CoursePurchaseBannerSection } from "@/components/course-purchase/CoursePurchaseBannerSection";
 
 /**
  * Full marketing homepage body (below layout header). Shared by `/` and `/dashboard` when the learner has no enrollments.
@@ -19,6 +20,7 @@ export function MarketingHomeSections() {
       <div className="pt-10 sm:pt-14">
         <Features />
         <Programs />
+        <CoursePurchaseBannerSection />
         <HowItWorks />
         <FAQ />
         <CTABand />

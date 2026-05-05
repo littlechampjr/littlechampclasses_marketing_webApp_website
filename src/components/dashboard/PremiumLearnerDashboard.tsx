@@ -5,6 +5,7 @@ import { Button, Drawer, Select, Skeleton, Space } from "antd";
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
+import { CoursePurchaseBannerSection } from "@/components/course-purchase/CoursePurchaseBannerSection";
 import { useBatchWeekSchedule } from "@/hooks/useBatchWeekSchedule";
 import type { ApiLearnerClassSession, ApiLearnerDashboard } from "@/lib/api/types";
 
@@ -163,7 +164,7 @@ export function PremiumLearnerDashboard({
           >
             View all programs
           </Link>
-          <div className="relative h-40 w-full max-w-md opacity-90 dark:opacity-80">
+          {/* <div className="relative h-40 w-full max-w-md opacity-90 dark:opacity-80">
             <Image
               src="/courses/thumb-stories.svg"
               alt=""
@@ -171,7 +172,11 @@ export function PremiumLearnerDashboard({
               className="object-contain object-bottom"
               unoptimized
             />
-          </div>
+          </div> */}
+        </div>
+
+        <div className="mt-10 w-full sm:mt-12">
+          <CoursePurchaseBannerSection bleed={false} />
         </div>
       </section>
 

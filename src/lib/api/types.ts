@@ -10,6 +10,45 @@ export type ApiUser = {
   createdAt?: string;
 };
 
+export type ApiPurchaseFeatureCard = {
+  iconEmoji: string;
+  title: string;
+  description: string;
+};
+
+export type ApiPurchaseDetailSection = {
+  emoji: string;
+  title: string;
+  bullets: string[];
+};
+
+export type ApiPurchaseLimitedOffer = {
+  label: string;
+  crossedPricePaise: number | null;
+  crossedPriceRupees: number | null;
+  giftLabel: string;
+};
+
+/** Premium checkout CMS — present only when `purchaseFlow.enabled` on the course. */
+export type ApiPurchaseFlowPayload = {
+  enabled: true;
+  bannerEyebrow: string;
+  bannerSubtitle: string;
+  previewCardProgramLine: string;
+  previewCardBadge: string;
+  dateLabel: string;
+  dateRangeDisplay: string | null;
+  subjectsLabel: string;
+  subjects: string[];
+  shortTagline: string;
+  emiAvailableCopy: string;
+  scheduleHeading: string;
+  featureCards: ApiPurchaseFeatureCard[];
+  scheduleBullets: string[];
+  detailSections: ApiPurchaseDetailSection[];
+  limitedOffers: ApiPurchaseLimitedOffer[];
+};
+
 export type ApiCourseBatch = {
   id: string;
   code: string;
@@ -42,6 +81,7 @@ export type ApiCourse = {
   isActive: boolean;
   bookDemoEnabled: boolean;
   batches: ApiCourseBatch[];
+  purchaseFlow: ApiPurchaseFlowPayload | null;
 };
 
 export type ApiBooking = {
