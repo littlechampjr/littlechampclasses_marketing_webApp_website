@@ -5,6 +5,7 @@ import { Button, Drawer, Select, Skeleton, Space } from "antd";
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
+import { CoursePurchaseBannerSection } from "@/components/course-purchase/CoursePurchaseBannerSection";
 import { useBatchWeekSchedule } from "@/hooks/useBatchWeekSchedule";
 import type { ApiLearnerClassSession, ApiLearnerDashboard } from "@/lib/api/types";
 
@@ -156,22 +157,8 @@ export function PremiumLearnerDashboard({
           )}
         </div>
 
-        <div className="mt-8 flex flex-col items-center gap-6 sm:mt-10">
-          <Link
-            href="/programs/after-school"
-            className="inline-flex min-h-11 items-center justify-center rounded-xl border-2 border-primary px-6 text-sm font-bold text-primary transition hover:bg-primary hover:text-primary-foreground"
-          >
-            View all programs
-          </Link>
-          <div className="relative h-40 w-full max-w-md opacity-90 dark:opacity-80">
-            <Image
-              src="/courses/thumb-stories.svg"
-              alt=""
-              fill
-              className="object-contain object-bottom"
-              unoptimized
-            />
-          </div>
+        <div className="mt-10 w-full sm:mt-12">
+          <CoursePurchaseBannerSection bleed={true} />
         </div>
       </section>
 
