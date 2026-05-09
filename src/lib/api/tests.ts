@@ -9,8 +9,10 @@ import type {
   SubmitAttemptBody,
 } from "./testsTypes";
 
-export function fetchTestList() {
-  return apiFetch<{ tests: ApiTestListItem[] }>("/api/tests", { method: "GET" });
+export function fetchTestList(courseId?: string | null) {
+  const q =
+    courseId && courseId.length > 0 ? `?courseId=${encodeURIComponent(courseId)}` : "";
+  return apiFetch<{ tests: ApiTestListItem[] }>(`/api/tests${q}`, { method: "GET" });
 }
 
 export function fetchTestDetail(testId: string) {
