@@ -1,5 +1,5 @@
 import { apiFetch } from "./client";
-import type { ApiLearnerDashboard, ApiWeekSchedule } from "./types";
+import type { ApiEnrolledProgramResponse, ApiLearnerDashboard, ApiWeekSchedule } from "./types";
 
 export async function fetchLearnerDashboard(token: string, batchId?: string | null) {
   const q =
@@ -22,6 +22,13 @@ export async function fetchBatchWeekSchedule(
   const qs = sp.toString();
   return apiFetch<ApiWeekSchedule>(
     `/api/me/batches/${encodeURIComponent(batchId)}/schedule${qs ? `?${qs}` : ""}`,
+    { method: "GET", token },
+  );
+}
+
+export async function fetchEnrolledProgram(token: string, enrollmentId: string) {
+  return apiFetch<ApiEnrolledProgramResponse>(
+    `/api/me/enrollments/${encodeURIComponent(enrollmentId)}/program`,
     { method: "GET", token },
   );
 }

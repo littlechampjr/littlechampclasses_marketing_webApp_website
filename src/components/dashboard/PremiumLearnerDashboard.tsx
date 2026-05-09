@@ -159,7 +159,7 @@ export function PremiumLearnerDashboard({
 
         <div className="mt-8 flex flex-col items-center gap-6 sm:mt-10">
           <Link
-            href="/programs/after-school"
+            href="/my-programs"
             className="inline-flex min-h-11 items-center justify-center rounded-xl border-2 border-primary px-6 text-sm font-bold text-primary transition hover:bg-primary hover:text-primary-foreground"
           >
             View all programs

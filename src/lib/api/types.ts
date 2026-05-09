@@ -168,6 +168,53 @@ export type ApiWeekSchedule = {
   days: ApiScheduleDay[];
 };
 
+export type ApiProgramTeacher = {
+  id: string;
+  name: string;
+  imageUrl: string;
+  subjectLabel: string;
+  bioLine: string;
+};
+
+export type ApiProgramFaq = {
+  id: string;
+  question: string;
+  answer: string;
+};
+
+export type ApiStudyChapter = {
+  title: string;
+  videoCount: number;
+  exerciseCount: number;
+  noteCount: number;
+  sortOrder: number;
+};
+
+export type ApiStudySubject = {
+  key: string;
+  label: string;
+  sortOrder: number;
+  chapters: ApiStudyChapter[];
+};
+
+export type ApiEnrolledProgramEnrollment = {
+  enrollmentId: string;
+  batchId: string;
+  courseId: string;
+  batchCode: string;
+  purchasedAt: string;
+  batchDateRangeLabel: string;
+};
+
+export type ApiEnrolledProgramResponse = {
+  isEnrolled: boolean;
+  enrollment: ApiEnrolledProgramEnrollment;
+  course: ApiCourse;
+  teachers: ApiProgramTeacher[];
+  faqs: ApiProgramFaq[];
+  studyRoom: { subjects: ApiStudySubject[] };
+};
+
 export class ApiError extends Error {
   constructor(
     public status: number,
