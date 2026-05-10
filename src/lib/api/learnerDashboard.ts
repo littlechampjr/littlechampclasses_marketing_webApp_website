@@ -1,5 +1,10 @@
 import { apiFetch } from "./client";
-import type { ApiEnrolledProgramResponse, ApiLearnerDashboard, ApiWeekSchedule } from "./types";
+import type {
+  ApiChapterContentResponse,
+  ApiEnrolledProgramResponse,
+  ApiLearnerDashboard,
+  ApiWeekSchedule,
+} from "./types";
 
 export async function fetchLearnerDashboard(token: string, batchId?: string | null) {
   const q =
@@ -29,6 +34,17 @@ export async function fetchBatchWeekSchedule(
 export async function fetchEnrolledProgram(token: string, enrollmentId: string) {
   return apiFetch<ApiEnrolledProgramResponse>(
     `/api/me/enrollments/${encodeURIComponent(enrollmentId)}/program`,
+    { method: "GET", token },
+  );
+}
+
+export async function fetchChapterContent(
+  token: string,
+  enrollmentId: string,
+  chapterId: string,
+) {
+  return apiFetch<ApiChapterContentResponse>(
+    `/api/me/enrollments/${encodeURIComponent(enrollmentId)}/chapters/${encodeURIComponent(chapterId)}`,
     { method: "GET", token },
   );
 }

@@ -185,11 +185,50 @@ export type ApiProgramFaq = {
 };
 
 export type ApiStudyChapter = {
+  /** Stable chapter id when outline uses subdocument ids (may be empty for legacy data). */
+  id: string;
   title: string;
   videoCount: number;
   exerciseCount: number;
   noteCount: number;
   sortOrder: number;
+};
+
+export type ApiChapterMeta = {
+  chapterId: string;
+  chapterTitle: string;
+  subjectKey: string;
+  subjectLabel: string;
+  batchDateRangeLabel: string;
+  programTitle: string;
+};
+
+export type ApiChapterLecture = {
+  id: string;
+  title: string;
+  durationSec: number;
+  videoUrl: string;
+  subjectTag: string;
+  teacherName: string;
+  teacherImageUrl: string;
+};
+
+export type ApiChapterPdfResource = {
+  id: string;
+  title: string;
+  publishedAt: string | null;
+  publishedAtLabel: string;
+  pdfUrl: string;
+  viewerMode: "inline" | "newTab";
+  sortOrder: number;
+};
+
+export type ApiChapterContentResponse = {
+  chapterMeta: ApiChapterMeta;
+  lectures: ApiChapterLecture[];
+  classNotes: ApiChapterPdfResource[];
+  chapterPdfs: ApiChapterPdfResource[];
+  dhaSolutions: ApiChapterPdfResource[];
 };
 
 export type ApiStudySubject = {
