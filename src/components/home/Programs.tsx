@@ -30,7 +30,7 @@ export function Programs() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            Programs by Classe
+            Programs by Classes
           </h2>
           <p className="mt-2 max-w-xl text-muted">
             Pick the band that matches your child—we tailor pacing, examples, and homework to their

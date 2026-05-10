@@ -21,12 +21,14 @@ export function Providers({ children }: { children: ReactNode }) {
         }}
       >
         <AntApp>
-          <BookDemoFlowProvider>
-            <Suspense fallback={null}>
-              <BookDemoUrlSync />
-            </Suspense>
-            <AuthProvider>{children}</AuthProvider>
-          </BookDemoFlowProvider>
+          <AuthProvider>
+            <BookDemoFlowProvider>
+              <Suspense fallback={null}>
+                <BookDemoUrlSync />
+              </Suspense>
+              {children}
+            </BookDemoFlowProvider>
+          </AuthProvider>
         </AntApp>
       </ConfigProvider>
     </StyleProvider>

@@ -119,6 +119,8 @@ export type ApiLearnerClassSession = {
   teacherImageUrl: string;
   statusMicrocopy: string;
   hasAttachments: boolean;
+  /** Google Meet or other live link; empty when not scheduled in CMS. */
+  meetUrl: string;
   /** YYYY-MM-DD in SCHEDULE_TZ for this session. */
   scheduleDateYmd: string;
   /** e.g. "25 Apr · Sat" */
