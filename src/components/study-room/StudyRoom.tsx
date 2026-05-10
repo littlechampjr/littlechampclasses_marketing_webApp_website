@@ -1,29 +1,32 @@
 "use client";
 
 import { BookOutlined, RightOutlined } from "@ant-design/icons";
+import Link from "next/link";
 import { cn } from "@/lib/cn";
 import type { ApiStudyChapter, ApiStudySubject } from "@/lib/api/types";
 import { useCallback, useMemo, useState } from "react";
 
 type Props = {
   subjects: ApiStudySubject[];
+  enrollmentId: string;
   className?: string;
 };
 
-function ChapterCard({ chapter }: { chapter: ApiStudyChapter }) {
+function ChapterCard({
+  chapter,
+  enrollmentId,
+}: {
+  chapter: ApiStudyChapter;
+  enrollmentId: string;
+}) {
   const stats = [
     chapter.videoCount > 0 ? `${chapter.videoCount} Videos` : null,
     `${chapter.exerciseCount} Exercises`,
     chapter.noteCount > 0 ? `${chapter.noteCount} Notes` : null,
   ].filter(Boolean);
 
-  return (
-    <div
-      className={cn(
-        "flex items-stretch gap-0 overflow-hidden rounded-2xl border border-border-soft bg-card shadow-sm",
-        "transition hover:border-primary/25 hover:shadow-md",
-      )}
-    >
+  const inner = (
+    <>
       <div className="w-1 shrink-0 bg-gradient-to-b from-primary to-primary/70" aria-hidden />
       <div className="flex min-w-0 flex-1 items-center justify-between gap-4 px-4 py-4 sm:px-5">
         <div className="min-w-0">
@@ -32,11 +35,35 @@ function ChapterCard({ chapter }: { chapter: ApiStudyChapter }) {
         </div>
         <RightOutlined className="shrink-0 text-muted" aria-hidden />
       </div>
+    </>
+  );
+
+  if (chapter.id?.trim()) {
+    return (
+      <Link
+        href={`/my-programs/${encodeURIComponent(enrollmentId)}/chapters/${encodeURIComponent(chapter.id)}`}
+        className={cn(
+          "flex items-stretch gap-0 overflow-hidden rounded-2xl border border-border-soft bg-card shadow-sm",
+          "transition hover:border-primary/25 hover:shadow-md",
+        )}
+      >
+        {inner}
+      </Link>
+    );
+  }
+
+  return (
+    <div
+      className={cn(
+        "flex items-stretch gap-0 overflow-hidden rounded-2xl border border-border-soft bg-card shadow-sm",
+      )}
+    >
+      {inner}
     </div>
   );
 }
 
-export function StudyRoom({ subjects, className }: Props) {
+export function StudyRoom({ subjects, enrollmentId, className }: Props) {
   const sorted = useMemo(
     () => [...subjects].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
     [subjects],
@@ -136,7 +163,11 @@ export function StudyRoom({ subjects, className }: Props) {
           </div>
           <div className="space-y-3">
             {chapters.map((ch) => (
-              <ChapterCard key={`${active?.key}-${ch.title}-${ch.sortOrder}`} chapter={ch} />
+              <ChapterCard
+                key={ch.id?.trim() ? ch.id : `${active?.key}-${ch.title}-${ch.sortOrder}`}
+                chapter={ch}
+                enrollmentId={enrollmentId}
+              />
             ))}
           </div>
         </div>

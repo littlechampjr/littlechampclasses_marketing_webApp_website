@@ -3,8 +3,8 @@
 import { ArrowLeftOutlined, CustomerServiceOutlined } from "@ant-design/icons";
 import { Skeleton } from "antd";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useMemo } from "react";
 import { TestsListClient } from "@/app/(marketing)/tests/TestsListClient";
 import { CourseDescriptionTab } from "@/components/my-programs/CourseDescriptionTab";
 import { CourseProgramHeader } from "@/components/my-programs/CourseProgramHeader";
@@ -22,6 +22,8 @@ type TabKey = "description" | "study" | "homework";
 
 export function EnrolledProgramClient({ enrollmentId }: Props) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { token, user, loading: authLoading } = useAuth();
   const { data, loading, error, refetch } = useEnrolledProgram(
     token,
@@ -36,10 +38,26 @@ export function EnrolledProgramClient({ enrollmentId }: Props) {
     return [...base, { key: "study", label: "Study Room" }, { key: "homework", label: "Homework" }];
   }, [showEnrolledTabs]);
 
-  const [activeTab, setActiveTab] = useState<TabKey>("description");
-
   const validKeys = useMemo(() => new Set(tabDefs.map((t) => t.key)), [tabDefs]);
-  const effectiveTab = validKeys.has(activeTab) ? activeTab : "description";
+
+  const tabQuery = searchParams.get("tab");
+
+  const effectiveTab = useMemo((): TabKey => {
+    const pick = (raw: string | null): TabKey | null => {
+      if (raw === "study" || raw === "homework" || raw === "description") {
+        return validKeys.has(raw) ? raw : null;
+      }
+      return null;
+    };
+    return pick(tabQuery) ?? "description";
+  }, [tabQuery, validKeys]);
+
+  const onTabChange = useCallback(
+    (k: TabKey) => {
+      router.replace(`${pathname}?tab=${encodeURIComponent(k)}`, { scroll: false });
+    },
+    [pathname, router],
+  );
 
   if (authLoading) {
     return (
@@ -148,14 +166,16 @@ export function EnrolledProgramClient({ enrollmentId }: Props) {
             className="mb-2"
             items={tabDefs}
             activeKey={effectiveTab}
-            onChange={setActiveTab}
+            onChange={onTabChange}
           />
 
           <div className="mt-8 min-h-[12rem]" role="tabpanel">
             {effectiveTab === "description" ? (
               <CourseDescriptionTab course={course} teachers={teachers} faqs={faqs} />
             ) : null}
-            {effectiveTab === "study" ? <StudyRoom subjects={studyRoom.subjects} /> : null}
+            {effectiveTab === "study" ? (
+              <StudyRoom subjects={studyRoom.subjects} enrollmentId={enrollmentId} />
+            ) : null}
             {effectiveTab === "homework" ? (
               <div className="pb-8">
                 <TestsListClient courseId={enrollment.courseId} compact />

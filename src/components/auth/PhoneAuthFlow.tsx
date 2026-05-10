@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
+import { IndianMobileField } from "@/components/common/IndianMobileField";
 import { OtpInput } from "@/components/common/OtpInput";
 import { Button } from "@/components/ui/Button";
 import { usePhoneAuth } from "@/hooks/usePhoneAuth";
@@ -149,32 +150,14 @@ export function PhoneAuthFlow() {
             <span className="font-medium text-foreground">Register</span>
           </p>
           <div className="mt-6">
-            <label className="block text-xs font-medium text-muted" htmlFor="auth-phone">
-              Mobile number
-            </label>
-            <div className="mt-1.5 flex overflow-hidden rounded-xl border border-border-soft bg-background focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
-              <div className="flex shrink-0 items-center border-r border-border-soft bg-foreground/5 px-3 text-sm font-semibold text-foreground">
-                +91
-                <span className="ml-0.5 text-muted" aria-hidden>
-                  ▾
-                </span>
-              </div>
-              <input
-                id="auth-phone"
-                name="phone"
-                type="tel"
-                inputMode="numeric"
-                autoComplete="tel-national"
-                placeholder="10-digit number"
-                maxLength={10}
-                value={national}
-                onChange={(e) => setNational(e.target.value.replace(/\D/g, "").slice(0, 10))}
-                className="min-w-0 flex-1 border-0 bg-transparent px-4 py-3 text-base text-foreground outline-none"
-              />
-            </div>
-            <p className="mt-2 text-center text-xs text-muted">
-              Course material may be shared via WhatsApp on this number.
-            </p>
+            <IndianMobileField
+              id="auth-phone"
+              value={national}
+              onChange={setNational}
+              disabled={submitting}
+              footerAlign="center"
+              footer="Course material may be shared via WhatsApp on this number."
+            />
           </div>
         </>
       ) : (

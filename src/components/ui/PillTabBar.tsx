@@ -13,8 +13,8 @@ export type PillTabBarProps<K extends string> = {
   items: PillTabItem<K>[];
   activeKey: K;
   onChange: (key: K) => void;
-  /** `default` — neutral surface; `peach` — warm program header style */
-  variant?: "default" | "peach";
+  /** `default` — neutral surface; `peach` — warm program header style; `underline` — scrollable bar with accent underline */
+  variant?: "default" | "peach" | "underline";
   /** Accessible name for the tablist */
   ariaLabel: string;
   className?: string;
@@ -32,6 +32,62 @@ export function PillTabBar<K extends string>({
   ariaLabel,
   className,
 }: PillTabBarProps<K>) {
+  if (variant === "underline") {
+    return (
+      <div
+        className={cn(
+          "border-b border-border-soft/90 bg-gradient-to-r from-orange-50/50 via-transparent to-transparent dark:from-orange-950/20",
+          className,
+        )}
+      >
+        <div
+          role="tablist"
+          aria-label={ariaLabel}
+          className={cn(
+            "flex gap-1 overflow-x-auto scroll-smooth px-1 pb-px",
+            "[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+            "sm:gap-8 sm:px-0",
+          )}
+        >
+          {items.map(({ key, label, shortLabel }) => {
+            const isActive = activeKey === key;
+            return (
+              <button
+                key={key}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => onChange(key)}
+                title={shortLabel ? label : undefined}
+                className={cn(
+                  "relative shrink-0 px-4 py-3 text-sm font-bold tracking-tight transition-colors sm:px-1 sm:py-4 sm:text-[0.9375rem]",
+                  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
+                  isActive ? "text-primary" : "text-muted hover:text-foreground",
+                )}
+              >
+                {shortLabel ? (
+                  <>
+                    <span className="sm:hidden">{shortLabel}</span>
+                    <span className="hidden sm:inline">{label}</span>
+                  </>
+                ) : (
+                  label
+                )}
+                <span
+                  className={cn(
+                    "absolute bottom-0 left-2 right-2 h-0.5 rounded-full transition-opacity sm:left-0 sm:right-0",
+                    isActive ? "bg-primary opacity-100" : "bg-primary opacity-0",
+                  )}
+                  aria-hidden
+                />
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className={cn(

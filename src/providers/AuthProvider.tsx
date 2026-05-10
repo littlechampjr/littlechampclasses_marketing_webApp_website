@@ -20,6 +20,8 @@ type AuthContextValue = {
   user: ApiUser | null;
   loading: boolean;
   signInWithOtp: (phoneNational10: string, code: string) => Promise<{ needsOnboarding: boolean }>;
+  /** Persist login JWT after server-trusted flows (e.g. book-demo payment). */
+  establishSession: (nextToken: string, nextUser: ApiUser) => void;
   completeOnboarding: (input: {
     childName: string;
     learningGoal: string;
@@ -98,6 +100,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { needsOnboarding: data.needsOnboarding };
   }, []);
 
+  const establishSession = useCallback((nextToken: string, nextUser: ApiUser) => {
+    window.localStorage.setItem(STORAGE_KEY, nextToken);
+    setToken(nextToken);
+    setUser(nextUser);
+  }, []);
+
   const completeOnboarding = useCallback(
     async (input: { childName: string; learningGoal: string; childGrade: number }) => {
       const t = window.localStorage.getItem(STORAGE_KEY);
@@ -114,11 +122,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       loading,
       signInWithOtp,
+      establishSession,
       completeOnboarding,
       logout,
       refreshUser,
     }),
-    [token, user, loading, signInWithOtp, completeOnboarding, logout, refreshUser],
+    [token, user, loading, signInWithOtp, establishSession, completeOnboarding, logout, refreshUser],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

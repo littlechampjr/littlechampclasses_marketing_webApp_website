@@ -1,4 +1,5 @@
 import { apiFetch } from "./client";
+import type { ApiUser } from "./types";
 
 export async function sendBookDemoOtp(body: {
   phone: string;
@@ -43,7 +44,13 @@ export async function verifyBookDemoPayment(body: {
   razorpay_payment_id: string;
   razorpay_signature: string;
 }) {
-  return apiFetch<{ ok: boolean; enrollmentId: string }>("/api/book-demo/verify-payment", {
+  return apiFetch<{
+    ok: boolean;
+    enrollmentId: string;
+    token: string;
+    user: ApiUser;
+    needsOnboarding: boolean;
+  }>("/api/book-demo/verify-payment", {
     method: "POST",
     body: JSON.stringify(body),
   });

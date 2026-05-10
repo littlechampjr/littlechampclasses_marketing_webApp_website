@@ -1,9 +1,11 @@
 "use client";
 
-import { App as AntApp, Input, Space } from "antd";
+import { App as AntApp } from "antd";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { IndianMobileField } from "@/components/common/IndianMobileField";
 import { OtpInput } from "@/components/common/OtpInput";
 import { createBookDemoOrder, verifyBookDemoPayment } from "@/lib/api/bookDemo";
 import { ApiError } from "@/lib/api/types";
@@ -17,6 +19,7 @@ import {
 import { site } from "@/lib/site-config";
 import { cn } from "@/lib/cn";
 import { useOtpChallenge } from "@/hooks/useOtpChallenge";
+import { useAuth } from "@/providers/AuthProvider";
 
 const GRADES = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
 
@@ -33,6 +36,8 @@ function formatMmSs(totalSec: number): string {
 }
 
 export function BookDemoCheckoutContent({ course, onClose, onBackToPrograms }: BookDemoCheckoutContentProps) {
+  const router = useRouter();
+  const { establishSession } = useAuth();
   const { message } = AntApp.useApp();
   const [step, setStep] = useState<"form" | "otp">("form");
   const [grade, setGrade] = useState(1);
@@ -171,9 +176,13 @@ export function BookDemoCheckoutContent({ course, onClose, onBackToPrograms }: B
         theme: { color: "#f97316" },
         handler: async (response) => {
           try {
-            await verifyBookDemoPayment(response);
-            message.success("Payment successful! We will contact you on WhatsApp.");
+            const verified = await verifyBookDemoPayment(response);
+            establishSession(verified.token, verified.user);
+            message.success("Payment successful! Opening your dashboard…");
             onClose();
+            const next = verified.needsOnboarding ? "/onboarding" : "/dashboard";
+            router.push(next);
+            router.refresh();
           } catch (e) {
             message.error(e instanceof ApiError ? e.message : "Payment verification failed.");
           }
@@ -290,29 +299,13 @@ export function BookDemoCheckoutContent({ course, onClose, onBackToPrograms }: B
               </div>
             )}
 
-            <div>
-              <p className="text-sm font-semibold text-foreground">Mobile number</p>
-              <Space.Compact className="mt-2 w-full" block>
-                <Input
-                  readOnly
-                  value="+91"
-                  size="large"
-                  className="!w-[4.5rem] !rounded-l-xl !text-center"
-                  tabIndex={-1}
-                  disabled={busy}
-                />
-                <Input
-                  size="large"
-                  className="!min-w-0 !flex-1 !rounded-r-xl"
-                  placeholder="9876543210"
-                  maxLength={10}
-                  value={phoneNational}
-                  onChange={(e) => setPhoneNational(e.target.value.replace(/\D/g, "").slice(0, 10))}
-                  disabled={busy}
-                />
-              </Space.Compact>
-              <p className="mt-2 text-xs text-muted">Course material and updates will be shared via WhatsApp on this number.</p>
-            </div>
+            <IndianMobileField
+              id="book-demo-phone"
+              value={phoneNational}
+              onChange={setPhoneNational}
+              disabled={busy}
+              footer="Course material and updates will be shared via WhatsApp on this number."
+            />
 
             <div className="flex items-end justify-between gap-4 border-t border-border-soft pt-4">
               <span className="text-sm font-medium text-muted">Price</span>

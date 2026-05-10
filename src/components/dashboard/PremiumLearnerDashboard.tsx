@@ -8,6 +8,7 @@ import { useCallback, useMemo, useState } from "react";
 import { CoursePurchaseBannerSection } from "@/components/course-purchase/CoursePurchaseBannerSection";
 import { useBatchWeekSchedule } from "@/hooks/useBatchWeekSchedule";
 import type { ApiLearnerClassSession, ApiLearnerDashboard } from "@/lib/api/types";
+import { cn } from "@/lib/cn";
 
 const FALLBACK_THUMB = "/courses/thumb-stories.svg";
 
@@ -106,7 +107,7 @@ export function PremiumLearnerDashboard({
           size="large"
           className="w-full border-2 border-border-soft bg-card rounded-xl px-4 py-2 shadow-sm transition duration-200 hover:border-primary/40 focus:border-primary focus:shadow-md focus:shadow-primary/20"
           classNames={{
-            popup: { root: "px-4 py-2 text-sm bg-primary/10" },
+            popup: { root: "px-4 py-2 text-sm" },
           }}
           options={selectOptions}
           value={selectValue}
@@ -261,45 +262,9 @@ export function PremiumLearnerDashboard({
                     {day.sessions.map((s) => (
                       <li
                         key={s.id}
-                        className="rounded-xl border border-border-soft bg-card p-3 shadow-sm transition hover:border-primary/30 dark:shadow-none"
+                        className="rounded-xl border border-border-soft bg-card p-0 shadow-sm transition hover:border-primary/30 dark:shadow-none"
                       >
-                        <div className="flex gap-3">
-                          <div className="relative h-15 w-16 shrink-0 overflow-hidden rounded-lg bg-foreground/5">
-                            <Image
-                              src={
-                                s.teacherImageUrl?.trim()
-                                  ? s.teacherImageUrl.trim()
-                                  : teacherThumbForSubject(s.subject)
-                              }
-                              alt=""
-                              fill
-                              className="object-cover"
-                              sizes="64px"
-                              unoptimized={
-                                !s.teacherImageUrl?.trim() ||
-                                s.teacherImageUrl.endsWith(".svg") ||
-                                s.teacherImageUrl.endsWith(".webp")
-                              }
-                            />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-xs font-semibold text-accent">{s.subject}</p>
-                            <p className="truncate font-bold text-foreground">{s.title}</p>
-                            <Space size={10} className="mt-1 text-xs text-muted">
-                              <span className="inline-flex items-center gap-1">
-                                <ClockCircleOutlined />
-                                {s.startsAtLabel}
-                              </span>
-                              <span className="inline-flex items-center gap-1">
-                                <ClockCircleOutlined />
-                                {s.durationLabel}
-                              </span>
-                            </Space>
-                          </div>
-                          {s.hasAttachments ? (
-                            <PaperClipOutlined className="mt-auto shrink-0 text-primary" aria-label="Attachments" />
-                          ) : null}
-                        </div>
+                        <ScheduleSessionRow session={s} />
                       </li>
                     ))}
                   </ul>
@@ -321,10 +286,70 @@ export function PremiumLearnerDashboard({
   );
 }
 
+function ScheduleSessionRow({ session: s }: { session: ApiLearnerClassSession }) {
+  const meet = s.meetUrl?.trim() ?? "";
+  const inner = (
+    <div className="flex gap-3 p-3">
+      <div className="relative h-15 w-16 shrink-0 overflow-hidden rounded-lg bg-foreground/5">
+        <Image
+          src={
+            s.teacherImageUrl?.trim() ? s.teacherImageUrl.trim() : teacherThumbForSubject(s.subject)
+          }
+          alt=""
+          fill
+          className="object-cover"
+          sizes="64px"
+          unoptimized={
+            !s.teacherImageUrl?.trim() ||
+            s.teacherImageUrl.endsWith(".svg") ||
+            s.teacherImageUrl.endsWith(".webp")
+          }
+        />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-xs font-semibold text-accent">{s.subject}</p>
+        <p className="truncate font-bold text-foreground">{s.title}</p>
+        <Space size={10} className="mt-1 text-xs text-muted">
+          <span className="inline-flex items-center gap-1">
+            <ClockCircleOutlined />
+            {s.startsAtLabel}
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <ClockCircleOutlined />
+            {s.durationLabel}
+          </span>
+        </Space>
+        {meet ? (
+          <p className="mt-2 text-xs font-semibold text-primary">Tap to join live class</p>
+        ) : null}
+      </div>
+      {s.hasAttachments ? (
+        <PaperClipOutlined className="mt-auto shrink-0 text-primary" aria-label="Attachments" />
+      ) : null}
+    </div>
+  );
+
+  if (meet) {
+    return (
+      <a
+        href={meet}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block rounded-xl text-inherit no-underline outline-offset-2 transition hover:bg-primary/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
+      >
+        {inner}
+      </a>
+    );
+  }
+
+  return inner;
+}
+
 function LearnerClassCard({ session, mode }: { session: ApiLearnerClassSession; mode: "today" | "upcoming" }) {
   const thumb =
     session.teacherImageUrl?.trim() || teacherThumbForSubject(session.subject);
   const svg = thumb.endsWith(".svg");
+  const meet = session.meetUrl?.trim() ?? "";
 
   const whenBadge =
     mode === "today" ? (
@@ -341,8 +366,13 @@ function LearnerClassCard({ session, mode }: { session: ApiLearnerClassSession; 
       </span>
     );
 
-  return (
-    <article className="group overflow-hidden rounded-2xl border border-border-soft bg-card shadow-sm transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md dark:shadow-none">
+  const card = (
+    <article
+      className={cn(
+        "group overflow-hidden rounded-2xl border border-border-soft bg-card shadow-sm transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md dark:shadow-none",
+        meet ? "cursor-pointer" : "",
+      )}
+    >
       <div className="flex gap-4 p-4 sm:p-5">
         <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-surface-subtle/70 ring-1 ring-border-soft sm:h-28 sm:w-28 dark:bg-card">
           <div className="absolute inset-0 bg-[radial-gradient(120px_80px_at_30%_10%,rgba(249,115,22,0.18),transparent_60%),radial-gradient(120px_80px_at_80%_90%,rgba(14,165,233,0.12),transparent_55%)]" />
@@ -384,6 +414,9 @@ function LearnerClassCard({ session, mode }: { session: ApiLearnerClassSession; 
               {session.statusMicrocopy}
             </div>
           ) : null}
+          {meet ? (
+            <p className="mt-2 text-xs font-semibold text-primary">Tap card to join live class</p>
+          ) : null}
         </div>
       </div>
       {session.statusMicrocopy ? (
@@ -391,4 +424,19 @@ function LearnerClassCard({ session, mode }: { session: ApiLearnerClassSession; 
       ) : null}
     </article>
   );
+
+  if (meet) {
+    return (
+      <a
+        href={meet}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block rounded-2xl no-underline text-inherit outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
+      >
+        {card}
+      </a>
+    );
+  }
+
+  return card;
 }

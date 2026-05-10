@@ -23,7 +23,7 @@ export const mainNav: NavItem[] = [
   { label: "After-School", href: "/programs/after-school" },
   { label: "Learn English", href: "/programs/english" },
   { label: "Learn Maths", href: "/programs/maths" },
-  { label: "Activity Kits", href: "/programs/activity-kits" },
+  // { label: "Activity Kits", href: "/programs/activity-kits" },
   { label: "Practice tests", href: "/tests" },
 ];
 
@@ -34,7 +34,7 @@ export const footerNav: { title: string; links: FooterOrActionLink[] }[] = [
       { label: "After-School", href: "/programs/after-school" },
       { label: "Learn English", href: "/programs/english" },
       { label: "Learn Maths", href: "/programs/maths" },
-      { label: "Activity Kits", href: "/programs/activity-kits" },
+      // { label: "Activity Kits", href: "/programs/activity-kits" },
     ],
   },
   {
