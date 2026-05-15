@@ -1,6 +1,6 @@
 const items = [
   {
-    title: "Interactive classes",
+    title: "Live interactive classes",
     subtitle: "Small groups, real teachers",
     icon: (
       <span

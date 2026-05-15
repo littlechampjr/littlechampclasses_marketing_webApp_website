@@ -3,7 +3,7 @@ import { Section } from "@/components/layout/Section";
 const steps = [
   { step: "01", title: "Tell us about your child", body: "Age, goals, and schedule—takes a few minutes." },
   { step: "02", title: "Match with a cohort", body: "We place learners in small groups at the right level." },
-  { step: "03", title: "Learn live, weekly", body: "Interactive classes, practice, and mentor support." },
+  { step: "03", title: "Learn live, weekly", body: "Live interactive classes, practice, and mentor support." },
 ];
 
 export function HowItWorks() {

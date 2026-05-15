@@ -2,7 +2,7 @@ export const site = {
   name: "Little Champ Junior",
   brandLine: "Online • IIT mentors",
   domain: "littlechampclasses.com",
-  tagline: "Learning made fun for curious young minds",
+  tagline: "The Ultimate Playground for Active Brains",
   description:
     "Live, interactive classes from 1st–8th school readiness, maths, English, Science and hands-on activities led by caring IITians and NITians.",
   playfulLittleChampLogoVersion: 2,
@@ -11,6 +11,12 @@ export const site = {
   heroCircleImageSrc:
     "/Exploring%20knowledge%20through%20interactive%20learning.png",
   contactEmail: "littlechampclasses@gmail.com",
+  /** National 10-digit Indian mobile for counsellor / support (display via `formatIndianMobileDisplay`, dial via `tel:+91…`). */
+  counsellorPhoneNational10: "9453503369",
+  counsellorModalTitle: "Talk to a counsellor",
+  counsellorModalSubtitle:
+    "Have doubts? Our support team will be happy to assist you!",
+  counsellorSupportImageSrc: "/counsellor-support.webp",
 } as const;
 
 export type NavItem = { label: string; href: string };
@@ -20,18 +26,18 @@ export type FooterOrActionLink = NavItem | { label: string; openBookDemo: true }
 
 /** CuriousJr-style primary nav */
 export const mainNav: NavItem[] = [
-  { label: "After-School", href: "/programs/after-school" },
+  { label: "School Curriculum", href: "/programs/after-school" },
   { label: "Learn English", href: "/programs/english" },
   { label: "Learn Maths", href: "/programs/maths" },
   // { label: "Activity Kits", href: "/programs/activity-kits" },
-  { label: "Practice tests", href: "/tests" },
+  { label: "Contact Us", href: `tel:+91${site.counsellorPhoneNational10}` },
 ];
 
 export const footerNav: { title: string; links: FooterOrActionLink[] }[] = [
   {
     title: "Programs",
     links: [
-      { label: "After-School", href: "/programs/after-school" },
+      { label: "School Curriculum", href: "/programs/after-school" },
       { label: "Learn English", href: "/programs/english" },
       { label: "Learn Maths", href: "/programs/maths" },
       // { label: "Activity Kits", href: "/programs/activity-kits" },
