@@ -18,8 +18,8 @@ export function CuriousHero() {
       <div className="relative mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-2 lg:gap-14">
         <div className="order-2 lg:order-1">
           <h1 className="font-display text-4xl font-extrabold leading-[1.12] tracking-tight text-foreground sm:text-5xl lg:text-[2.75rem]">
-            Learning made fun for{" "}
-            <span className="text-primary">Curious Minds!</span>
+          The Ultimate Playground for {" "}
+            <span className="text-primary">Active Brains</span>
           </h1>
           <p className="mt-4 max-w-xl text-base leading-relaxed text-muted sm:text-lg">
             Let your child start learning how to excel—with joyful live classes in early maths,

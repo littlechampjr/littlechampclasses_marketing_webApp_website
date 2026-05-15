@@ -17,8 +17,8 @@ export function SiteFooter() {
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-6">
           <div className="lg:col-span-2">
             <p className="font-display text-xl font-extrabold text-foreground">{site.name}</p>
-            <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted">{site.tagline}</p>
-            <p className="mt-4 text-xs text-muted">
+            <p className="mt-2 max-w-sm text-base leading-relaxed text-muted">{site.tagline}</p>
+            <p className="mt-4 text-base text-muted">
               Contact us at <code className="rounded bg-surface-subtle px-1"><strong>9453503369</strong></code>
             </p>
           </div>
