@@ -165,29 +165,43 @@ export function BookDemoCheckoutContent({ course, onClose, onBackToPrograms }: B
         return;
       }
       setBusy(false);
-      openRazorpayCheckout({
-        key: order.keyId,
-        amount: order.amount,
-        currency: order.currency,
-        order_id: order.orderId,
-        name: site.name,
-        description: heading || "Book Demo",
-        prefill: { contact: national },
-        theme: { color: "#f97316" },
-        handler: async (response) => {
-          try {
-            const verified = await verifyBookDemoPayment(response);
-            establishSession(verified.token, verified.user);
-            message.success("Payment successful! Opening your dashboard…");
-            onClose();
-            const next = verified.needsOnboarding ? "/onboarding" : "/dashboard";
-            router.push(next);
-            router.refresh();
-          } catch (e) {
-            message.error(e instanceof ApiError ? e.message : "Payment verification failed.");
-          }
+      openRazorpayCheckout(
+        {
+          key: order.keyId,
+          amount: order.amount,
+          currency: order.currency,
+          order_id: order.orderId,
+          name: site.name,
+          description: heading || "Book Demo",
+          prefill: { contact: national },
+          theme: { color: "#f97316" },
+          modal: {
+            ondismiss: () => {
+              setBusy(false);
+              message.info("Payment cancelled.");
+            },
+          },
+          handler: async (response) => {
+            try {
+              const verified = await verifyBookDemoPayment(response);
+              establishSession(verified.token, verified.user);
+              message.success("Payment successful! Opening your dashboard…");
+              onClose();
+              const next = verified.needsOnboarding ? "/onboarding" : "/dashboard";
+              router.push(next);
+              router.refresh();
+            } catch (e) {
+              message.error(e instanceof ApiError ? e.message : "Payment verification failed.");
+            }
+          },
         },
-      });
+        {
+          onPaymentFailed: (resp) => {
+            setBusy(false);
+            message.error(resp.error.description || "Payment failed. Please try again.");
+          },
+        },
+      );
     } catch (e) {
       message.error(e instanceof ApiError ? e.message : "Could not start payment.");
       setBusy(false);

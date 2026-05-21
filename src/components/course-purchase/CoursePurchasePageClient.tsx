@@ -186,27 +186,38 @@ export function CoursePurchasePageClient({ initialCourse }: { initialCourse: Api
         return;
       }
       setPayBusy(false);
-      openRazorpayCheckout({
-        key: order.keyId,
-        amount: order.amount,
-        currency: order.currency,
-        order_id: order.orderId,
-        name: site.name,
-        description: order.courseTitle,
-        prefill: user?.phoneNational10 ? { contact: user.phoneNational10 } : undefined,
-        theme: { color: "#f97316" },
-        modal: {
-          ondismiss: () => {},
+      openRazorpayCheckout(
+        {
+          key: order.keyId,
+          amount: order.amount,
+          currency: order.currency,
+          order_id: order.orderId,
+          name: site.name,
+          description: order.courseTitle,
+          prefill: user?.phoneNational10 ? { contact: user.phoneNational10 } : undefined,
+          theme: { color: "#f97316" },
+          modal: {
+            ondismiss: () => {
+              setPayBusy(false);
+              message.info("Payment cancelled.");
+            },
+          },
+          handler: async (resp) => {
+            try {
+              await verifyPurchasePayment(slug, token, resp);
+              setSuccessOpen(true);
+            } catch (e) {
+              message.error(e instanceof ApiError ? e.message : "Payment verification failed.");
+            }
+          },
         },
-        handler: async (resp) => {
-          try {
-            await verifyPurchasePayment(slug, token, resp);
-            setSuccessOpen(true);
-          } catch (e) {
-            message.error(e instanceof ApiError ? e.message : "Payment verification failed.");
-          }
+        {
+          onPaymentFailed: (resp) => {
+            setPayBusy(false);
+            message.error(resp.error.description || "Payment failed. Please try again.");
+          },
         },
-      });
+      );
     } catch (e) {
       message.error(e instanceof ApiError ? e.message : "Could not start checkout.");
       setPayBusy(false);

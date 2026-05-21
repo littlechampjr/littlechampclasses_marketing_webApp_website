@@ -36,6 +36,16 @@ export type RazorpaySuccessResponse = {
   razorpay_signature: string;
 };
 
+export type RazorpayFailedResponse = {
+  error: {
+    code: string;
+    description: string;
+    reason?: string;
+    source?: string;
+    step?: string;
+  };
+};
+
 export type RazorpayOpenOptions = {
   key: string;
   amount: number;
@@ -49,17 +59,32 @@ export type RazorpayOpenOptions = {
   modal?: { ondismiss?: () => void };
 };
 
+export type RazorpayCheckoutCallbacks = {
+  onPaymentFailed?: (response: RazorpayFailedResponse) => void;
+};
+
+type RazorpayInstance = {
+  open: () => void;
+  on: (event: "payment.failed", handler: (response: RazorpayFailedResponse) => void) => void;
+};
+
 declare global {
   interface Window {
-    Razorpay?: new (options: RazorpayOpenOptions) => { open: () => void };
+    Razorpay?: new (options: RazorpayOpenOptions) => RazorpayInstance;
   }
 }
 
-export function openRazorpayCheckout(options: RazorpayOpenOptions): void {
+export function openRazorpayCheckout(
+  options: RazorpayOpenOptions,
+  callbacks?: RazorpayCheckoutCallbacks,
+): void {
   const Ctor = window.Razorpay;
   if (!Ctor) {
     throw new Error("Razorpay is not loaded");
   }
   const rzp = new Ctor(options);
+  if (callbacks?.onPaymentFailed) {
+    rzp.on("payment.failed", callbacks.onPaymentFailed);
+  }
   rzp.open();
 }
