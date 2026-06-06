@@ -24,6 +24,7 @@ import { site } from "@/lib/site-config";
 import { cn } from "@/lib/cn";
 import { useOtpChallenge } from "@/hooks/useOtpChallenge";
 import { useAuth } from "@/providers/AuthProvider";
+import { useBookDemoFlow } from "@/providers/BookDemoFlowProvider";
 
 const GRADES = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
 
@@ -42,6 +43,7 @@ function formatMmSs(totalSec: number): string {
 export function BookDemoCheckoutContent({ course, onClose, onBackToPrograms }: BookDemoCheckoutContentProps) {
   const router = useRouter();
   const { token, user, establishSession } = useAuth();
+  const { showSuccess } = useBookDemoFlow();
   const isLoggedIn = Boolean(token && user?.phoneNational10);
   const { message } = AntApp.useApp();
   const [step, setStep] = useState<"form" | "otp">("form");
@@ -130,11 +132,21 @@ export function BookDemoCheckoutContent({ course, onClose, onBackToPrograms }: B
             try {
               const verified = await verifyBookDemoPayment(response);
               establishSession(verified.token, verified.user);
-              message.success("Payment successful! Opening your dashboard…");
-              onClose();
               const next = verified.needsOnboarding ? "/onboarding" : "/dashboard";
-              router.push(next);
-              router.refresh();
+              // Close the book-demo modal first so the celebration modal sits
+              // cleanly on top of the page underneath.
+              onClose();
+              showSuccess({
+                mode: "demo",
+                courseTitle: programTitle,
+                primaryLabel: verified.needsOnboarding
+                  ? "Complete your profile"
+                  : "Go to my dashboard",
+                onPrimary: () => {
+                  router.push(next);
+                  router.refresh();
+                },
+              });
             } catch (e) {
               message.error(e instanceof ApiError ? e.message : "Payment verification failed.");
             }
@@ -148,7 +160,7 @@ export function BookDemoCheckoutContent({ course, onClose, onBackToPrograms }: B
         },
       );
     },
-    [establishSession, heading, message, onClose, router],
+    [establishSession, heading, message, onClose, programTitle, router, showSuccess],
   );
 
   /**

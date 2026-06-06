@@ -12,10 +12,21 @@ import {
 } from "react";
 import { BookDemoFlowModal } from "@/components/book-demo/BookDemoFlowModal";
 import { isCourseBookable } from "@/components/book-demo/courseUtils";
+import {
+  PaymentSuccessModal,
+  type PaymentSuccessMode,
+} from "@/components/common/PaymentSuccessModal";
 import { apiFetch } from "@/lib/api/client";
 import type { ApiCourse } from "@/lib/api/types";
 
 type FlowStep2 = { course: ApiCourse };
+
+type SuccessState = {
+  mode: PaymentSuccessMode;
+  courseTitle?: string;
+  primaryLabel?: string;
+  onPrimary?: () => void;
+};
 
 type BookDemoFlowContextValue = {
   courses: ApiCourse[];
@@ -33,6 +44,12 @@ type BookDemoFlowContextValue = {
   goToStep1: () => void;
   goNextFromStep1: () => void;
   close: () => void;
+  /**
+   * Show the celebration modal at app-root level. Caller closes the
+   * book-demo flow modal first, then calls this — the success modal
+   * floats above whatever is now visible (usually the dashboard).
+   */
+  showSuccess: (state: SuccessState) => void;
 };
 
 const BookDemoFlowContext = createContext<BookDemoFlowContextValue | null>(null);
@@ -52,6 +69,7 @@ export function BookDemoFlowProvider({ children }: { children: ReactNode }) {
   const [step, setStep] = useState<1 | 2>(1);
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
   const [step2, setStep2] = useState<FlowStep2 | null>(null);
+  const [success, setSuccess] = useState<SuccessState | null>(null);
 
   const reloadCourses = useCallback(async () => {
     setCoursesLoading(true);
@@ -111,6 +129,14 @@ export function BookDemoFlowProvider({ children }: { children: ReactNode }) {
     setStep2(null);
   }, []);
 
+  const showSuccess = useCallback((state: SuccessState) => {
+    setSuccess(state);
+  }, []);
+
+  const dismissSuccess = useCallback(() => {
+    setSuccess(null);
+  }, []);
+
   const goNextFromStep1 = useCallback(() => {
     if (!selectedCourseId) {
       message.warning("Pick a learning program to continue.");
@@ -142,6 +168,7 @@ export function BookDemoFlowProvider({ children }: { children: ReactNode }) {
       goToStep1,
       goNextFromStep1,
       close,
+      showSuccess,
     }),
     [
       close,
@@ -156,6 +183,7 @@ export function BookDemoFlowProvider({ children }: { children: ReactNode }) {
       openPicker,
       reloadCourses,
       selectedCourseId,
+      showSuccess,
       step,
       step2,
     ],
@@ -165,6 +193,18 @@ export function BookDemoFlowProvider({ children }: { children: ReactNode }) {
     <BookDemoFlowContext.Provider value={value}>
       {children}
       <BookDemoFlowModal />
+      <PaymentSuccessModal
+        open={Boolean(success)}
+        onClose={dismissSuccess}
+        mode={success?.mode ?? "course"}
+        courseTitle={success?.courseTitle}
+        primaryLabel={success?.primaryLabel}
+        onPrimary={() => {
+          const fn = success?.onPrimary;
+          dismissSuccess();
+          if (fn) fn();
+        }}
+      />
     </BookDemoFlowContext.Provider>
   );
 }

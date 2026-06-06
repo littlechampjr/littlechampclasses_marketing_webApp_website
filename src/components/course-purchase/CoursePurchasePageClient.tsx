@@ -21,8 +21,11 @@ import { site } from "@/lib/site-config";
 import { CourseDetails } from "./CourseDetails";
 import { PricingCard } from "./PricingCard";
 
-const EnrollmentSuccessModal = dynamic(
-  () => import("./EnrollmentSuccessModal").then((m) => ({ default: m.EnrollmentSuccessModal })),
+const PaymentSuccessModal = dynamic(
+  () =>
+    import("@/components/common/PaymentSuccessModal").then((m) => ({
+      default: m.PaymentSuccessModal,
+    })),
   { ssr: false },
 );
 
@@ -333,7 +336,18 @@ export function CoursePurchasePageClient({ initialCourse }: { initialCourse: Api
         )}
       </Modal>
 
-      <EnrollmentSuccessModal open={successOpen} onClose={() => setSuccessOpen(false)} />
+      <PaymentSuccessModal
+        open={successOpen}
+        onClose={() => setSuccessOpen(false)}
+        mode="course"
+        courseTitle={initialCourse.marketingTitle?.trim() || initialCourse.title}
+        primaryLabel="Go to my courses"
+        onPrimary={() => {
+          setSuccessOpen(false);
+          router.push("/dashboard");
+          router.refresh();
+        }}
+      />
     </div>
   );
 }
