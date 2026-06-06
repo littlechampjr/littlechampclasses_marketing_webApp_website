@@ -6,6 +6,7 @@ import { FeaturedPrograms } from "@/components/home/FeaturedPrograms";
 import { Features } from "@/components/home/Features";
 import { HeroFeatureBar } from "@/components/home/HeroFeatureBar";
 import { HowItWorks } from "@/components/home/HowItWorks";
+import { MobileAppBanner } from "@/components/home/MobileAppBanner";
 import { Programs } from "@/components/home/Programs";
 import { CoursePurchaseBannerSection } from "@/components/course-purchase/CoursePurchaseBannerSection";
 
@@ -25,6 +26,7 @@ export function MarketingHomeSections() {
         <HowItWorks />
         <FacultyCarousel />
         <FAQ />
+        <MobileAppBanner />
         <CTABand />
       </div>
     </>

@@ -88,7 +88,7 @@ function FacultyCard({
   const canKnowMore = Boolean(teacher.modalTagline || teacher.highlights.length > 0);
   return (
     <div
-      className="group flex h-[440px] flex-col overflow-hidden rounded-2xl bg-gradient-to-b from-orange-50 to-orange-200 shadow-sm transition hover:shadow-md sm:h-[480px]"
+      className="group flex h-[440px] flex-col overflow-hidden rounded-2xl bg-gradient-to-b from-orange-50 to-orange-200 shadow-sm transition hover:shadow-md sm:h-[416px]"
     >
       {/* Fixed-height text block so all cards align regardless of bio length. */}
       <div className="flex h-[170px] shrink-0 flex-col px-5 pt-5 sm:px-6 sm:pt-6">
@@ -127,10 +127,17 @@ function FacultyCard({
           <img
             src={teacher.imageUrl}
             alt={teacher.name}
-            className="h-full w-auto object-contain transition group-hover:scale-[1.02]"
+            className="object-contain h-[240px] transition group-hover:scale-[1.02]"
             loading="lazy"
           />
-        ) : null}
+        ) :
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={"/avatartest.png"}
+            alt={"teacher placeholder"}
+            className="object-contain h-[240px] transition group-hover:scale-[1.02]"
+            loading="lazy"
+          />}
       </div>
     </div>
   );

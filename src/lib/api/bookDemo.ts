@@ -39,6 +39,27 @@ export async function createBookDemoOrder(token: string) {
   });
 }
 
+/**
+ * Logged-in shortcut: no OTP. Uses the user's auth JWT directly. The server
+ * reads the phone from the User record — client cannot override it.
+ */
+export async function createBookDemoOrderAsUser(
+  userToken: string,
+  body: { courseSlug: string; batchId: string; grade: number },
+) {
+  return apiFetch<{
+    keyId: string;
+    orderId: string;
+    amount: number;
+    currency: string;
+    enrollmentId: string;
+  }>("/api/book-demo/create-order-as-user", {
+    method: "POST",
+    body: JSON.stringify(body),
+    token: userToken,
+  });
+}
+
 export async function verifyBookDemoPayment(body: {
   razorpay_order_id: string;
   razorpay_payment_id: string;

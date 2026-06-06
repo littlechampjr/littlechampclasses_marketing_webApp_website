@@ -17,7 +17,7 @@ export function Section({
   as: Tag = "section",
 }: SectionProps) {
   return (
-    <Tag id={id} className={cn("px-4 py-16 sm:px-6 sm:py-20 lg:py-24", className)}>
+    <Tag id={id} className={cn("px-4 py-4 sm:px-6 sm:py-4 lg:py-12", className)}>
       <div
         className={cn(
           "mx-auto w-full max-w-6xl",

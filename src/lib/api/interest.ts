@@ -13,3 +13,14 @@ export async function confirmInterestWaitlist(body: { phone: string; courseSlug:
     body: JSON.stringify(body),
   });
 }
+
+/**
+ * Logged-in waitlist join. No OTP — phone is read from the user's account on the server.
+ */
+export async function confirmInterestWaitlistAsUser(userToken: string, courseSlug: string) {
+  return apiFetch<{ ok: boolean; message: string }>("/api/interest/confirm-as-user", {
+    method: "POST",
+    body: JSON.stringify({ courseSlug }),
+    token: userToken,
+  });
+}
