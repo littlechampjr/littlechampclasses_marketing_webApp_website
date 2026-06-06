@@ -20,14 +20,14 @@ export function CourseDetails({ course, className }: Props) {
   return (
     <div className={cn("space-y-12", className)}>
       <header className="overflow-hidden rounded-3xl border border-border-soft bg-card shadow-[0_20px_50px_-32px_rgba(0,0,0,0.18)] dark:shadow-black/35">
-        <div className="flex flex-col gap-5 p-5 sm:flex-row sm:gap-8 sm:p-8">
-          <div className="relative mx-auto h-44 w-full max-w-[200px] shrink-0 rounded-2xl bg-surface-subtle sm:mx-0 sm:h-[140px] sm:w-[176px]">
+        <div className="flex flex-col gap-5 p-5 sm:flex-col sm:gap-8 sm:p-8">
+          <div className="relative mx-auto h-[304px] w-full shrink-0 rounded-2xl bg-surface-subtle sm:mx-0 sm:h-[340px]]">
             <Image
               src={thumb}
               alt=""
               fill
               className="rounded-2xl object-cover"
-              sizes="176px"
+              // sizes="176px"
             />
           </div>
           <div className="min-w-0 flex-1 pt-2">

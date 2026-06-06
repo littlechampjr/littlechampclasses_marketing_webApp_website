@@ -1,5 +1,6 @@
 import { CTABand } from "@/components/home/CTABand";
 import { CuriousHero } from "@/components/home/CuriousHero";
+import { FacultyCarousel } from "@/components/home/FacultyCarousel";
 import { FAQ } from "@/components/home/FAQ";
 import { FeaturedPrograms } from "@/components/home/FeaturedPrograms";
 import { Features } from "@/components/home/Features";
@@ -22,6 +23,7 @@ export function MarketingHomeSections() {
         <Programs />
         <CoursePurchaseBannerSection />
         <HowItWorks />
+        <FacultyCarousel />
         <FAQ />
         <CTABand />
       </div>

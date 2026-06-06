@@ -20,7 +20,7 @@ export function Logo() {
           className="h-full w-auto max-w-full object-contain object-left"
         />
       </span>
-      <span className="hidden shrink-0 border-l border-border-soft pl-3 text-[11px] font-medium leading-snug text-muted lg:block lg:max-w-[5.5rem]">
+      <span className="hidden shrink-0 border-l border-border-soft pl-3 text-sm font-semibold leading-snug text-muted lg:block lg:max-w-[5.5rem]">
         {site.brandLine}
       </span>
     </Link>

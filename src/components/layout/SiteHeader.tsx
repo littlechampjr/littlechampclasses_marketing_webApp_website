@@ -13,7 +13,7 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border-soft bg-card/95 shadow-sm backdrop-blur-md">
-      <div className="relative mx-auto flex min-h-[5rem] max-w-6xl items-center justify-between gap-4 px-4 py-2 sm:min-h-[5.25rem] sm:px-6 sm:py-2.5">
+      <div className="relative mx-auto flex min-h-[5rem] max-w-[1248px] items-center justify-between gap-[6rem] px-4 py-2 sm:min-h-[5.25rem] sm:px-6 sm:py-2.5">
         <Logo />
 
         <nav
