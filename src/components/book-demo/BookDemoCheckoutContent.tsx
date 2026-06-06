@@ -7,7 +7,11 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { IndianMobileField } from "@/components/common/IndianMobileField";
 import { OtpInput } from "@/components/common/OtpInput";
-import { createBookDemoOrder, verifyBookDemoPayment } from "@/lib/api/bookDemo";
+import {
+  createBookDemoOrder,
+  createBookDemoOrderAsUser,
+  verifyBookDemoPayment,
+} from "@/lib/api/bookDemo";
 import { ApiError } from "@/lib/api/types";
 import type { ApiCourse, ApiCourseBatch } from "@/lib/api/types";
 import { buildBookDemoHeading } from "@/lib/bookDemoHeading";
@@ -20,6 +24,7 @@ import { site } from "@/lib/site-config";
 import { cn } from "@/lib/cn";
 import { useOtpChallenge } from "@/hooks/useOtpChallenge";
 import { useAuth } from "@/providers/AuthProvider";
+import { useBookDemoFlow } from "@/providers/BookDemoFlowProvider";
 
 const GRADES = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
 
@@ -37,7 +42,9 @@ function formatMmSs(totalSec: number): string {
 
 export function BookDemoCheckoutContent({ course, onClose, onBackToPrograms }: BookDemoCheckoutContentProps) {
   const router = useRouter();
-  const { establishSession } = useAuth();
+  const { token, user, establishSession } = useAuth();
+  const { showSuccess } = useBookDemoFlow();
+  const isLoggedIn = Boolean(token && user?.phoneNational10);
   const { message } = AntApp.useApp();
   const [step, setStep] = useState<"form" | "otp">("form");
   const [grade, setGrade] = useState(1);
@@ -56,10 +63,11 @@ export function BookDemoCheckoutContent({ course, onClose, onBackToPrograms }: B
     setStep("form");
     setGrade(1);
     setBatchId(course.batches[0]?.id ?? "");
-    setPhoneNational("");
+    // Logged-in users: lock the phone to their account number (no override).
+    setPhoneNational(isLoggedIn ? user!.phoneNational10 : "");
     setOtp("");
     resetCooldown();
-  }, [course, resetCooldown]);
+  }, [course, resetCooldown, isLoggedIn, user]);
 
   const batch: ApiCourseBatch | undefined = useMemo(
     () => course.batches.find((b) => b.id === batchId),
@@ -93,6 +101,95 @@ export function BookDemoCheckoutContent({ course, onClose, onBackToPrograms }: B
       onClose();
     }
   }, [busy, onClose]);
+
+  const openRazorpayForBookDemo = useCallback(
+    async (
+      order: { keyId: string; orderId: string; amount: number; currency: string },
+      phoneContact: string,
+    ) => {
+      if (!order.keyId) {
+        message.error("Payment gateway is not configured.");
+        return;
+      }
+      setBusy(false);
+      openRazorpayCheckout(
+        {
+          key: order.keyId,
+          amount: order.amount,
+          currency: order.currency,
+          order_id: order.orderId,
+          name: site.name,
+          description: heading || "Book Demo",
+          prefill: { contact: phoneContact },
+          theme: { color: "#f97316" },
+          modal: {
+            ondismiss: () => {
+              setBusy(false);
+              message.info("Payment cancelled.");
+            },
+          },
+          handler: async (response) => {
+            try {
+              const verified = await verifyBookDemoPayment(response);
+              establishSession(verified.token, verified.user);
+              const next = verified.needsOnboarding ? "/onboarding" : "/dashboard";
+              // Close the book-demo modal first so the celebration modal sits
+              // cleanly on top of the page underneath.
+              onClose();
+              showSuccess({
+                mode: "demo",
+                courseTitle: programTitle,
+                primaryLabel: verified.needsOnboarding
+                  ? "Complete your profile"
+                  : "Go to my dashboard",
+                onPrimary: () => {
+                  router.push(next);
+                  router.refresh();
+                },
+              });
+            } catch (e) {
+              message.error(e instanceof ApiError ? e.message : "Payment verification failed.");
+            }
+          },
+        },
+        {
+          onPaymentFailed: (resp) => {
+            setBusy(false);
+            message.error(resp.error.description || "Payment failed. Please try again.");
+          },
+        },
+      );
+    },
+    [establishSession, heading, message, onClose, programTitle, router, showSuccess],
+  );
+
+  /**
+   * Logged-in users: skip OTP entirely. Phone is fixed to the user's account
+   * (set at login), so we go straight from "Book Demo" → Razorpay.
+   */
+  const handleBookDemoAsUser = async () => {
+    if (!batch) {
+      message.error("Select a batch.");
+      return;
+    }
+    if (!token || !user?.phoneNational10) {
+      message.error("Please sign in again.");
+      return;
+    }
+    setBusy(true);
+    try {
+      await loadRazorpayScript();
+      const order = await createBookDemoOrderAsUser(token, {
+        courseSlug: course.slug,
+        batchId: batch.id,
+        grade,
+      });
+      await openRazorpayForBookDemo(order, user.phoneNational10);
+    } catch (e) {
+      message.error(e instanceof ApiError ? e.message : "Could not start payment.");
+      setBusy(false);
+    }
+  };
 
   const handleSendOtp = async () => {
     if (!batch) {
@@ -160,34 +257,7 @@ export function BookDemoCheckoutContent({ course, onClose, onBackToPrograms }: B
       const verified = await verifyBookDemoOtpRequest(national, otp);
       await loadRazorpayScript();
       const order = await createBookDemoOrder(verified.token);
-      if (!order.keyId) {
-        message.error("Payment gateway is not configured.");
-        return;
-      }
-      setBusy(false);
-      openRazorpayCheckout({
-        key: order.keyId,
-        amount: order.amount,
-        currency: order.currency,
-        order_id: order.orderId,
-        name: site.name,
-        description: heading || "Book Demo",
-        prefill: { contact: national },
-        theme: { color: "#f97316" },
-        handler: async (response) => {
-          try {
-            const verified = await verifyBookDemoPayment(response);
-            establishSession(verified.token, verified.user);
-            message.success("Payment successful! Opening your dashboard…");
-            onClose();
-            const next = verified.needsOnboarding ? "/onboarding" : "/dashboard";
-            router.push(next);
-            router.refresh();
-          } catch (e) {
-            message.error(e instanceof ApiError ? e.message : "Payment verification failed.");
-          }
-        },
-      });
+      await openRazorpayForBookDemo(order, national);
     } catch (e) {
       message.error(e instanceof ApiError ? e.message : "Could not start payment.");
       setBusy(false);
@@ -303,8 +373,12 @@ export function BookDemoCheckoutContent({ course, onClose, onBackToPrograms }: B
               id="book-demo-phone"
               value={phoneNational}
               onChange={setPhoneNational}
-              disabled={busy}
-              footer="Course material and updates will be shared via WhatsApp on this number."
+              disabled={busy || isLoggedIn}
+              footer={
+                isLoggedIn
+                  ? "Using your signed-in number. Updates will be shared via WhatsApp on this number."
+                  : "Course material and updates will be shared via WhatsApp on this number."
+              }
             />
 
             <div className="flex items-end justify-between gap-4 border-t border-border-soft pt-4">
@@ -320,7 +394,7 @@ export function BookDemoCheckoutContent({ course, onClose, onBackToPrograms }: B
             <button
               type="button"
               disabled={busy || !batch}
-              onClick={() => void handleSendOtp()}
+              onClick={() => void (isLoggedIn ? handleBookDemoAsUser() : handleSendOtp())}
               className="flex min-h-12 w-full items-center justify-center rounded-2xl bg-primary text-base font-bold text-primary-foreground shadow-lg shadow-primary/25 transition hover:opacity-95 disabled:opacity-50"
             >
               Book Demo

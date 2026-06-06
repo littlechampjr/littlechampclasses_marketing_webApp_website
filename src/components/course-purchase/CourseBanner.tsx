@@ -137,7 +137,7 @@ export function CourseBanner({ slides }: { slides: CourseBannerSlide[] }) {
 
             <div className="flex flex-1 flex-col justify-between gap-8">
               <div className="space-y-5">
-                <MetaRow icon="📺" label="Master Course">
+                <MetaRow icon="📺" label="Exclusive Master Course">
                   <p className="text-base font-bold text-white sm:text-lg">{current.displayTitle}</p>
                 </MetaRow>
                 <MetaRow icon="📆" label={current.dateLabel}>

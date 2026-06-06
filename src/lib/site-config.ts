@@ -1,6 +1,6 @@
 export const site = {
   name: "Little Champ Junior",
-  brandLine: "Online • IIT mentors",
+  brandLine: "Online • IIT Mentors",
   domain: "littlechampclasses.com",
   tagline: "The Ultimate Playground for Active Brains",
   description:

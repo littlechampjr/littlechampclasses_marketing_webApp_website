@@ -21,8 +21,11 @@ import { site } from "@/lib/site-config";
 import { CourseDetails } from "./CourseDetails";
 import { PricingCard } from "./PricingCard";
 
-const EnrollmentSuccessModal = dynamic(
-  () => import("./EnrollmentSuccessModal").then((m) => ({ default: m.EnrollmentSuccessModal })),
+const PaymentSuccessModal = dynamic(
+  () =>
+    import("@/components/common/PaymentSuccessModal").then((m) => ({
+      default: m.PaymentSuccessModal,
+    })),
   { ssr: false },
 );
 
@@ -186,27 +189,38 @@ export function CoursePurchasePageClient({ initialCourse }: { initialCourse: Api
         return;
       }
       setPayBusy(false);
-      openRazorpayCheckout({
-        key: order.keyId,
-        amount: order.amount,
-        currency: order.currency,
-        order_id: order.orderId,
-        name: site.name,
-        description: order.courseTitle,
-        prefill: user?.phoneNational10 ? { contact: user.phoneNational10 } : undefined,
-        theme: { color: "#f97316" },
-        modal: {
-          ondismiss: () => {},
+      openRazorpayCheckout(
+        {
+          key: order.keyId,
+          amount: order.amount,
+          currency: order.currency,
+          order_id: order.orderId,
+          name: site.name,
+          description: order.courseTitle,
+          prefill: user?.phoneNational10 ? { contact: user.phoneNational10 } : undefined,
+          theme: { color: "#f97316" },
+          modal: {
+            ondismiss: () => {
+              setPayBusy(false);
+              message.info("Payment cancelled.");
+            },
+          },
+          handler: async (resp) => {
+            try {
+              await verifyPurchasePayment(slug, token, resp);
+              setSuccessOpen(true);
+            } catch (e) {
+              message.error(e instanceof ApiError ? e.message : "Payment verification failed.");
+            }
+          },
         },
-        handler: async (resp) => {
-          try {
-            await verifyPurchasePayment(slug, token, resp);
-            setSuccessOpen(true);
-          } catch (e) {
-            message.error(e instanceof ApiError ? e.message : "Payment verification failed.");
-          }
+        {
+          onPaymentFailed: (resp) => {
+            setPayBusy(false);
+            message.error(resp.error.description || "Payment failed. Please try again.");
+          },
         },
-      });
+      );
     } catch (e) {
       message.error(e instanceof ApiError ? e.message : "Could not start checkout.");
       setPayBusy(false);
@@ -322,7 +336,18 @@ export function CoursePurchasePageClient({ initialCourse }: { initialCourse: Api
         )}
       </Modal>
 
-      <EnrollmentSuccessModal open={successOpen} onClose={() => setSuccessOpen(false)} />
+      <PaymentSuccessModal
+        open={successOpen}
+        onClose={() => setSuccessOpen(false)}
+        mode="course"
+        courseTitle={initialCourse.marketingTitle?.trim() || initialCourse.title}
+        primaryLabel="Go to my courses"
+        onPrimary={() => {
+          setSuccessOpen(false);
+          router.push("/dashboard");
+          router.refresh();
+        }}
+      />
     </div>
   );
 }

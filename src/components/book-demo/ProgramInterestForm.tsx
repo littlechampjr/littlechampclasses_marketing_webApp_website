@@ -5,12 +5,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { OtpInput } from "@/components/common/OtpInput";
-import { confirmInterestWaitlist, sendInterestWaitlistOtp } from "@/lib/api/interest";
+import {
+  confirmInterestWaitlist,
+  confirmInterestWaitlistAsUser,
+  sendInterestWaitlistOtp,
+} from "@/lib/api/interest";
 import { ApiError } from "@/lib/api/types";
 import type { ApiCourse } from "@/lib/api/types";
 import { parseIndianMobileNational10 } from "@/lib/phone";
 import { cn } from "@/lib/cn";
 import { useOtpResendCooldown } from "@/hooks/useOtpResendCooldown";
+import { useAuth } from "@/providers/AuthProvider";
 
 export type ProgramInterestFormProps = {
   course: ApiCourse;
@@ -26,6 +31,8 @@ function formatMmSs(totalSec: number): string {
 
 export function ProgramInterestForm({ course, onClose, onBackToPrograms }: ProgramInterestFormProps) {
   const { message } = AntApp.useApp();
+  const { token, user } = useAuth();
+  const isLoggedIn = Boolean(token && user?.phoneNational10);
   const [step, setStep] = useState<"phone" | "otp">("phone");
   const [phoneNational, setPhoneNational] = useState("");
   const [otp, setOtp] = useState("");
@@ -37,10 +44,29 @@ export function ProgramInterestForm({ course, onClose, onBackToPrograms }: Progr
 
   useEffect(() => {
     setStep("phone");
-    setPhoneNational("");
+    // Logged-in users: prefill (and lock) their account phone.
+    setPhoneNational(isLoggedIn ? user!.phoneNational10 : "");
     setOtp("");
     resetCooldown();
-  }, [course.id, resetCooldown]);
+  }, [course.id, resetCooldown, isLoggedIn, user]);
+
+  /** Logged-in waitlist join: no OTP, phone read from account on server. */
+  const joinWaitlistAsUser = useCallback(async () => {
+    if (!token) {
+      message.error("Please sign in again.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const res = await confirmInterestWaitlistAsUser(token, course.slug);
+      message.success(res.message);
+      onClose();
+    } catch (e) {
+      message.error(e instanceof ApiError ? e.message : "Could not save. Try again.");
+    } finally {
+      setBusy(false);
+    }
+  }, [course.slug, message, onClose, token]);
 
   const sendOtp = useCallback(async () => {
     const national = parseIndianMobileNational10(phoneNational);
@@ -148,8 +174,9 @@ export function ProgramInterestForm({ course, onClose, onBackToPrograms }: Progr
                   We’ll let you know when {programTitle} opens
                 </h2>
                 <p className="mt-2 text-sm leading-relaxed text-muted">
-                  You’re a little early—demo booking for this program isn’t live yet. Enter your number and
-                  we’ll send a one-time code to confirm it, then we’ll add you to the waitlist. No spam.
+                  {isLoggedIn
+                    ? "You’re a little early—demo booking for this program isn’t live yet. Join the waitlist and we’ll WhatsApp you on your signed-in number when it opens."
+                    : "You’re a little early—demo booking for this program isn’t live yet. Enter your number and we’ll send a one-time code to confirm it, then we’ll add you to the waitlist. No spam."}
                 </p>
               </>
             ) : (
@@ -198,24 +225,27 @@ export function ProgramInterestForm({ course, onClose, onBackToPrograms }: Progr
                   maxLength={10}
                   value={phoneNational}
                   onChange={(e) => setPhoneNational(e.target.value.replace(/\D/g, "").slice(0, 10))}
-                  disabled={busy}
+                  disabled={busy || isLoggedIn}
+                  readOnly={isLoggedIn}
                 />
               </Space.Compact>
               <p className="mt-2 text-xs text-muted">
-                We use this to send your OTP and later reach you on WhatsApp. We won’t share it for marketing.
+                {isLoggedIn
+                  ? "Using your signed-in number. We’ll WhatsApp you when this program opens."
+                  : "We use this to send your OTP and later reach you on WhatsApp. We won’t share it for marketing."}
               </p>
             </div>
 
             <button
               type="button"
               disabled={busy}
-              onClick={() => void sendOtp()}
+              onClick={() => void (isLoggedIn ? joinWaitlistAsUser() : sendOtp())}
               className={cn(
                 "flex min-h-12 w-full items-center justify-center rounded-2xl text-base font-bold shadow-lg transition",
                 "bg-primary text-primary-foreground shadow-primary/25 hover:opacity-95 disabled:opacity-50",
               )}
             >
-              {busy ? "Sending…" : "Send OTP"}
+              {busy ? (isLoggedIn ? "Joining…" : "Sending…") : isLoggedIn ? "Join waitlist" : "Send OTP"}
             </button>
           </>
         )}
