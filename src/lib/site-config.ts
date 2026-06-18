@@ -56,6 +56,7 @@ export const footerNav: { title: string; links: FooterOrActionLink[] }[] = [
     links: [
       { label: "Home", href: "/" },
       { label: "Contact", href: `mailto:${site.contactEmail}` },
+      { label: "Share Feedback", href: "/feedback" },
     ],
   },
   {
